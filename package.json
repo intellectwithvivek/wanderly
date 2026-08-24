@@ -1,26 +1,51 @@
 {
   "name": "wanderly",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
+  "license": "MIT",
+  "description": "Wanderly — a free, open-source travel & tours website template built with Next.js 16 and VivekUI. Boarding-pass trip cards, day-by-day itinerary timelines, and best-time-to-visit climate charts with no chart library.",
+  "keywords": [
+    "nextjs",
+    "nextjs-template",
+    "react",
+    "typescript",
+    "free-template",
+    "open-source",
+    "travel-website-template",
+    "vivekui",
+    "charts"
+  ],
+  "homepage": "https://wanderly.vivekkumarsingh.in",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/intellectwithvivek/wanderly.git"
+  },
+  "author": {
+    "name": "Vivek Kumar Singh",
+    "url": "https://vivekkumarsingh.in/"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@the_viveksingh/vivek-ui": "^0.5.0",
     "next": "16.3.2",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.2",
-    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }

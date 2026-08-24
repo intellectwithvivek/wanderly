@@ -1,26 +1,627 @@
-@import "tailwindcss";
+/* ==========================================================================
+   Wanderly — the whole custom stylesheet.
+
+   Two jobs only:
+
+   1. Re-point VivekUI's tokens to an emerald accent. Every component follows,
+      because every value in the library is a CSS custom property.
+   2. Draw the one motif this site owns — the boarding-pass ticket stub with a
+      perforated divider and punched side notches.
+
+   Nothing here uses `!important`, and nothing needs to: every library selector
+   is wrapped in `:where()` and so has specificity zero. A single flat class of
+   our own always wins.
+   ========================================================================== */
+
+/* --------------------------------------------------------------- Tokens */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Emerald, at a shade dark enough that white text on it clears WCAG AA. */
+  --vk-color-primary: #047857;
+  --vk-color-primary-fg: #ffffff;
+  --vk-color-primary-hover: #065f46;
+  --vk-color-primary-active: #064e3b;
+  --vk-color-primary-subtle: #ecfdf5;
+  --vk-color-primary-subtle-fg: #065f46;
+  --vk-color-ring: #047857;
+
+  /* Site-owned values. */
+  --nav-h: 3.5rem;
+  --ink-on-photo: #ffffff;
+  --scrim: color-mix(in oklab, #04140f 78%, transparent);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* The library's dark block is a bare `[data-theme=dark]` — same specificity as
+   our `:root` above, so it would lose on source order. Restating it here is
+   what keeps dark mode emerald rather than blue. */
+[data-theme='dark'] {
+  --vk-color-primary: #34d399;
+  --vk-color-primary-fg: #04241b;
+  --vk-color-primary-hover: #6ee7b7;
+  --vk-color-primary-active: #10b981;
+  --vk-color-primary-subtle: #052e22;
+  --vk-color-primary-subtle-fg: #6ee7b7;
+  --vk-color-ring: #34d399;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--vk-color-bg);
+  color: var(--vk-color-fg);
+  font-family: var(--vk-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Skip link — first thing in the tab order, invisible until focused. */
+.skip-link {
+  position: fixed;
+  inset-block-start: var(--vk-space-2);
+  inset-inline-start: var(--vk-space-2);
+  z-index: 100;
+  padding: var(--vk-space-2) var(--vk-space-4);
+  border-radius: var(--vk-radius-md);
+  background: var(--vk-color-primary);
+  color: var(--vk-color-primary-fg);
+  font-weight: var(--vk-weight-semibold);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* ------------------------------------------------- The boarding-pass motif */
+
+/*
+  One motif, used for every trip card, the deals carousel and the section
+  rules: a ticket with a perforated tear line and a semicircle punched out of
+  each side, level with it.
+
+  The notches are cut with two radial-gradient masks composited together,
+  which is why `.ticket` carries no box-shadow — a mask clips the shadow away
+  with everything else outside the box. The hover lift is a transform and a
+  border colour instead.
+*/
+.ticket {
+  --ticket-stub: 3.5rem;
+  --ticket-notch: 0.7rem;
+  --ticket-tear: calc(100% - var(--ticket-stub));
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--vk-color-border);
+  border-radius: var(--vk-radius-lg);
+  background: var(--vk-color-surface);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform var(--vk-duration) var(--vk-ease),
+    border-color var(--vk-duration) var(--vk-ease);
+
+  mask-image:
+    radial-gradient(circle var(--ticket-notch) at 0 var(--ticket-tear), #0000 98%, #000 100%),
+    radial-gradient(circle var(--ticket-notch) at 100% var(--ticket-tear), #0000 98%, #000 100%);
+  mask-composite: intersect;
+}
+
+a.ticket:hover,
+a.ticket:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--vk-color-primary);
+}
+
+/*
+  The focus ring has to be a pseudo-element, and that is entirely the mask's fault.
+
+  A mask clips everything the element paints outside the kept region — an `outline`
+  included. With `outline-offset: 3px` the ring is drawn in exactly the band the mask
+  throws away, so the keyboard focus indicator on a trip card was invisible: a WCAG
+  2.4.7 failure that no amount of `outline-width` fixes. `outline-offset: -3px` moves
+  it inside the mask, but then the card's own photograph paints over it, because
+  descendants paint above their parent's outline.
+
+  So the ring is a `::after` at `inset: 0` with a `z-index` above the media, the copy
+  and the stub. It is inside the masked region (so it survives) and above the children
+  (so nothing covers it). The notches nick it, which is the right look anyway.
+*/
+.ticket::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 2px solid transparent;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+a.ticket:focus-visible {
+  /* The real outline cannot survive the mask; `::after` carries the ring instead. */
+  outline: none;
+}
+
+a.ticket:focus-visible::after {
+  border-color: var(--vk-color-ring);
+  /* A second, inner contrast ring so the emerald reads against a dark photograph. */
+  outline: 2px solid var(--vk-color-primary-subtle);
+  outline-offset: -4px;
+}
+
+/* Forced-colours mode ignores author colours, so hand it a system one. */
+@media (forced-colors: active) {
+  a.ticket:focus-visible::after {
+    border-color: Highlight;
+    outline-color: CanvasText;
+  }
+}
+
+/*
+  The photograph absorbs whatever height the grid row has spare, rather than the
+  body doing it.
+
+  Grid rows equalise their tiles, so something has to take up the slack. Letting
+  the copy block stretch leaves a white gap under the badges; letting the picture
+  stretch just crops a little more of the picture. Hence `flex: 1` here and no
+  `flex` on `.ticket__body` — and no `aspect-ratio`, which on a double-width tile
+  would demand a 500px-tall photo and drag the whole row down with it.
+*/
+.ticket__media {
+  position: relative;
+  flex: 1 1 auto;
+  min-block-size: 13rem;
+  background: var(--vk-color-surface-sunken);
+}
+
+.ticket__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The route strip that sits over the photograph: LIS ✈ DPS. */
+.ticket__route {
+  position: absolute;
+  inset-block-start: var(--vk-space-3);
+  inset-inline-start: var(--vk-space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vk-space-2);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--vk-radius-sm);
+  background: color-mix(in oklab, #04140f 72%, transparent);
+  color: var(--ink-on-photo);
+  font-family: var(--vk-font-mono);
+  font-size: 0.6875rem;
+  font-weight: var(--vk-weight-semibold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+
+.ticket__price {
+  position: absolute;
+  inset-block-end: var(--vk-space-3);
+  inset-inline-end: var(--vk-space-3);
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--vk-radius-sm);
+  background: var(--vk-color-primary);
+  color: var(--vk-color-primary-fg);
+  font-size: var(--vk-text-sm);
+  font-weight: var(--vk-weight-semibold);
+}
+
+.ticket__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vk-space-2);
+  padding: var(--vk-space-4);
+}
+
+/* The tear line. Sitting on the stub's leading edge is what puts it exactly
+   at `100% - var(--ticket-stub)`, which is where the masks punch the notches. */
+.ticket__stub {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: center;
+  block-size: var(--ticket-stub);
+  padding-inline: var(--vk-space-4);
+  border-block-start: 1px dashed var(--vk-color-border-strong);
+  background: var(--vk-color-surface-subtle);
+}
+
+.ticket__cell + .ticket__cell {
+  border-inline-start: 1px dashed var(--vk-color-border);
+  padding-inline-start: var(--vk-space-3);
+}
+
+.ticket__cell {
+  min-width: 0;
+}
+
+.ticket__cell dt,
+.eyebrow {
+  font-family: var(--vk-font-mono);
+  font-size: 0.625rem;
+  font-weight: var(--vk-weight-semibold);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vk-color-muted);
+}
+
+.ticket__cell dd {
+  margin: 0;
+  font-size: var(--vk-text-sm);
+  font-weight: var(--vk-weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The same tear line, standalone, as a section rule. */
+.perf-rule {
+  block-size: 1px;
+  margin-block: var(--vk-space-12);
+  border: 0;
+  background-image: linear-gradient(
+    to right,
+    var(--vk-color-border-strong) 0 0.5rem,
+    #0000 0.5rem 0.9rem
+  );
+  background-size: 0.9rem 1px;
+  background-repeat: repeat-x;
+}
+
+/* ------------------------------------------------------------ Hero */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-content: end;
+  min-block-size: min(88svh, 44rem);
+  padding-block: var(--vk-space-16) var(--vk-space-12);
+  overflow: hidden;
+}
+
+.hero__photo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.hero__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+}
+
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to top, var(--scrim) 0%, color-mix(in oklab, #04140f 45%, transparent) 45%, color-mix(in oklab, #04140f 20%, transparent) 100%);
+}
+
+.hero__copy {
+  max-width: 42rem;
+  color: var(--ink-on-photo);
+  text-shadow: 0 1px 24px color-mix(in oklab, #04140f 55%, transparent);
+}
+
+.hero__copy h1 {
+  font-size: clamp(2.25rem, 6vw, 3.75rem);
+  line-height: var(--vk-leading-tight);
+  letter-spacing: -0.02em;
+  margin-block-end: var(--vk-space-4);
+}
+
+.hero__copy p {
+  font-size: var(--vk-text-lg);
+  color: color-mix(in oklab, var(--ink-on-photo) 88%, transparent);
+}
+
+.hero__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vk-space-2);
+  margin-block-end: var(--vk-space-5);
+  padding: 0.3rem 0.7rem;
+  border: 1px solid color-mix(in oklab, #ffffff 40%, transparent);
+  border-radius: var(--vk-radius-full);
+  background: color-mix(in oklab, #04140f 45%, transparent);
+  color: var(--ink-on-photo);
+  font-family: var(--vk-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+
+/* The search card that overlaps the bottom edge of the hero. */
+.search-card {
+  position: relative;
+  z-index: 1;
+  margin-block-start: calc(var(--vk-space-8) * -1);
+}
+
+.search-grid {
+  display: grid;
+  gap: var(--vk-space-4);
+  grid-template-columns: 1fr;
+}
+
+@container (min-width: 46rem) {
+  .search-grid {
+    grid-template-columns: 1.4fr 1fr 1fr auto;
+    align-items: end;
+  }
+}
+
+/* ------------------------------------------------------- Page furniture */
+
+.page-head {
+  padding-block: var(--vk-space-12) var(--vk-space-8);
+}
+
+/* Two charts side by side once the card itself is wide enough.
+
+   The container being queried is the `Card` these sit in — VivekUI's `.vk-card`
+   declares `container-type: inline-size`. That is deliberately not a viewport
+   media query: a chart pair dropped into a narrow column stacks correctly on a
+   wide screen, which a media query would get wrong. */
+.chart-pair {
+  display: grid;
+  gap: var(--vk-space-6);
+}
+
+/* 44rem, not 52rem: a container query measures the container's CONTENT box, so a
+   Card with `padding: lg` is queried ~4rem narrower than it looks. */
+@container (min-width: 44rem) {
+  .chart-pair {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.chart-frame {
+  min-width: 0;
+  padding: var(--vk-space-4);
+  border: 1px solid var(--vk-color-border-subtle);
+  border-radius: var(--vk-radius-md);
+  background: var(--vk-color-surface-subtle);
+}
+
+.verdict {
+  display: flex;
+  gap: var(--vk-space-3);
+  align-items: flex-start;
+  margin-block-start: var(--vk-space-5);
+  padding: var(--vk-space-4);
+  border-inline-start: 3px solid var(--vk-color-primary);
+  border-radius: 0 var(--vk-radius-md) var(--vk-radius-md) 0;
+  background: var(--vk-color-primary-subtle);
+  color: var(--vk-color-primary-subtle-fg);
+}
+
+/* Sticky booking rail on the destination page. */
+.booking-rail {
+  position: sticky;
+  inset-block-start: calc(var(--nav-h) + var(--vk-space-4));
+}
+
+.detail-layout {
+  display: grid;
+  gap: var(--vk-space-10);
+  align-items: start;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr) 21rem;
+  }
+}
+
+/* Inclusions / exclusions. Two columns of badged lines. */
+.tick-list {
+  display: grid;
+  gap: var(--vk-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tick-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--vk-space-3);
+  align-items: start;
+  font-size: var(--vk-text-sm);
+  line-height: var(--vk-leading-relaxed);
+}
+
+/* Marquee ticker items. */
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vk-space-3);
+  font-family: var(--vk-font-mono);
+  font-size: var(--vk-text-sm);
+  font-weight: var(--vk-weight-semibold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vk-color-muted);
+}
+
+.ticker-item b {
+  color: var(--vk-color-fg);
+  font-weight: var(--vk-weight-semibold);
+}
+
+.ticker-dot {
+  color: var(--vk-color-primary);
+}
+
+/*
+  The navbar keeps five controls at every width, and five of them do not fit on a
+  390px screen — the actions row measured 401px against a 390px viewport, which is
+  a sideways-scrolling page. Two things give way on a phone, in this order.
+
+  First the credit badge shortens from "⚡ Built with VivekUI" to "⚡ VivekUI". The
+  credit is still visible and still links to the docs; only the filler words go, and
+  the anchor keeps its `title` for the long form.
+*/
+@media (max-width: 30rem) {
+  .nav-credit-long {
+    display: none;
+  }
+
+  /*
+    And the wordmark goes with it, leaving the mark as the brand.
+
+    Not a shrink-to-fit: the brand is a flex item, so letting it compress squeezed
+    "Wanderly" down to a clipped "W" — which reads as a broken layout rather than a
+    logo. Dropping the text is the deliberate version, and the brand link keeps its
+    `aria-label`, so it is still named "Wanderly — home".
+  */
+  .nav-wordmark {
+    display: none;
+  }
+}
+
+/*
+  Second, the repository link drops its word and shows only the glyph.
+
+  Hidden the visually-hidden way, not with `display: none`: the word is the link's
+  accessible name, and `display: none` would take it out of the accessibility tree
+  and leave a nameless link — the exact bug `IconButton` exists to prevent.
+*/
+@media (max-width: 47.9375rem) {
+  .nav-repo-label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* The promotion block in the footer. */
+.promo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--vk-space-3);
+  margin-block-start: var(--vk-space-4);
+  padding: var(--vk-space-3) var(--vk-space-4);
+  border: 1px dashed var(--vk-color-border-strong);
+  border-radius: var(--vk-radius-md);
+  background: var(--vk-color-surface-subtle);
+}
+
+/* Bento tiles are links; make the whole tile the hit area. */
+.bento-tile {
+  min-width: 0;
+  display: flex;
+}
+
+.bento-tile > * {
+  flex: 1;
+}
+
+/* Gallery slides inside a Carousel. */
+.slide-media {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: var(--vk-radius-md);
+  background: var(--vk-color-surface-sunken);
+}
+
+.slide-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Map frame, so the embed picks up the site's radius. */
+.map-frame {
+  overflow: hidden;
+  border: 1px solid var(--vk-color-border);
+  border-radius: var(--vk-radius-lg);
+}
+
+/* /built-with component table: keep the deep links readable. */
+.link-cell a {
+  color: var(--vk-color-primary);
+  font-weight: var(--vk-weight-medium);
+}
+
+/* ------------------------------------------------------- Content links */
+
+/*
+  VivekUI styles its own link components — `Navbar.Link`, `Footer`, `Breadcrumb`,
+  `Prose` — but deliberately leaves a plain `<a>` alone. That is the right call for a
+  library, and it means the bare links we write inside table cells and body copy fall
+  back to the browser's default blue, which has no business in an emerald palette.
+
+  Scoped to text contexts on purpose: a blanket `a { color }` would also repaint the
+  navbar, the footer columns and every `asChild` button, because those selectors are
+  all `:where()` and would lose.
+*/
+.vk-table a,
+.vk-text a,
+.vk-alert a,
+.vk-faq a,
+.vk-empty-state a,
+.vk-timeline a {
+  color: var(--vk-color-primary);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.vk-table a:hover,
+.vk-text a:hover,
+.vk-alert a:hover,
+.vk-faq a:hover {
+  color: var(--vk-color-primary-hover);
+}
+
+/* ------------------------------------------------- Library fix-up (one) */
+
+/*
+  VivekUI hides each chart's data table with the standard visually-hidden recipe —
+  `position: absolute; inline-size: 1px; overflow: hidden; clip-path: inset(50%)`.
+  That works for every element except a `<table>`, whose used width is never less
+  than its min-content width. With `white-space: nowrap` and twelve months of data
+  that is ~345px, so the "1px" box is really 345px wide. It is invisible and out of
+  flow, but it still contributes scrollable overflow, which on a 390px phone took
+  the document's scroll width to 402 and made every page scroll sideways.
+
+  Shrinking the table is not available (`table-layout: fixed` does not lift the
+  min-content floor, and `display: block` would cost the element its table role —
+  the very thing that makes it useful to a screen reader). So the box is contained
+  instead, one level up on the chart root. The SVG is always exactly as wide as this
+  box and the hover tooltip is drawn inside the viewBox, so nothing real is clipped.
+*/
+.vk-chart {
+  overflow-x: clip;
+}
+
+/* --------------------------------------------------------- Motion policy */
+
+@media (prefers-reduced-motion: reduce) {
+  .ticket,
+  a.ticket:hover,
+  a.ticket:focus-visible {
+    transition: none;
+    transform: none;
+  }
 }

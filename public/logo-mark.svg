@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Wanderly">
+  <title>Wanderly</title>
+  <defs>
+    <linearGradient id="w-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10b981" />
+      <stop offset="1" stop-color="#065f46" />
+    </linearGradient>
+    <!-- The same two punched notches as the boarding-pass cards on the site. -->
+    <mask id="w-notch">
+      <rect width="64" height="64" fill="#fff" />
+      <circle cx="0" cy="47" r="5.5" fill="#000" />
+      <circle cx="64" cy="47" r="5.5" fill="#000" />
+    </mask>
+  </defs>
+
+  <rect width="64" height="64" rx="14" fill="url(#w-bg)" mask="url(#w-notch)" />
+
+  <!-- The perforated tear line. -->
+  <path
+    d="M9 47h46"
+    stroke="#ffffff"
+    stroke-opacity="0.45"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-dasharray="3 4.5"
+  />
+
+  <!-- A north star: the compass half of "wander". -->
+  <path
+    d="M32 10.5 35.8 22.6 47.5 26.5 35.8 30.4 32 42.5 28.2 30.4 16.5 26.5 28.2 22.6Z"
+    fill="#ffffff"
+  />
+</svg>

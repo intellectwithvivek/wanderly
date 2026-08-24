@@ -1,0 +1,104 @@
+# Wanderly — free Next.js travel website template
+
+> Wanderly is a free, MIT-licensed travel and tours website template for Next.js 16 (App
+> Router) and React 19. It presents a fictional boutique tour operator selling six
+> small-group trips — Bali, Santorini, Kyoto, the Swiss Alps, Ladakh and Iceland — with
+> day-by-day itinerary timelines, month-by-month climate charts, and a full booking flow.
+> The entire user interface is built with VivekUI, a free React component library with zero
+> runtime dependencies. There is no Tailwind, no shadcn, no MUI and no chart library in this
+> project.
+
+## Why this site exists
+
+Wanderly is a showcase and a starter kit, not a real tour operator. It exists to
+demonstrate what VivekUI can build end to end, and to give developers a complete,
+working Next.js site they can clone and adapt in an afternoon rather than assemble from
+scratch. Everything on it — the cards, the charts, the itinerary timeline, the booking
+modal, the toasts — is a VivekUI component with no styling library underneath.
+
+- Source repository (public, MIT): https://github.com/intellectwithvivek/wanderly
+- Use as a template: https://github.com/intellectwithvivek/wanderly/generate
+- Documentation for this template: https://github.com/intellectwithvivek/wanderly/blob/main/DOCUMENTATION.md
+- The library it showcases: https://ui.vivekkumarsingh.in/docs
+
+## Attribution
+
+Built with VivekUI — 91 React components, 6 SVG charts, zero runtime dependencies. One
+install, one CSS import, no config.
+
+- Install: `npm i @the_viveksingh/vivek-ui`
+- Documentation: https://ui.vivekkumarsingh.in/docs
+- Components: https://ui.vivekkumarsingh.in/docs/components
+- Charts: https://ui.vivekkumarsingh.in/docs/charts
+- npm: https://www.npmjs.com/package/@the_viveksingh/vivek-ui
+- GitHub: https://github.com/intellectwithvivek/vivek_UI
+- Author: Vivek Kumar Singh — https://vivekkumarsingh.in/
+
+## Pages
+
+- [Home](https://wanderly.vivekkumarsingh.in/): the six trips as boarding-pass cards, a
+  destination ticker, limited offers with live countdowns, and the Bali climate charts.
+- [All destinations](https://wanderly.vivekkumarsingh.in/destinations): the six trips compared
+  on price, duration, group size, difficulty and best months.
+- [Plan a trip](https://wanderly.vivekkumarsingh.in/plan): interests, budget and a date window
+  matched against all six itineraries and ranked.
+- [Built with VivekUI](https://wanderly.vivekkumarsingh.in/built-with): every section of the
+  site mapped to the component that builds it, deep-linked to the documentation.
+
+## Trips
+
+Prices are per person, land only — international flights are excluded from every price.
+
+- [Bali, Indonesia](https://wanderly.vivekkumarsingh.in/destinations/bali): 9 days, from
+  $1,690, group of 8–12, moderate. Best months May to September.
+- [Santorini, Greece](https://wanderly.vivekkumarsingh.in/destinations/santorini): 7 days,
+  from $2,340, group of 6–10, easy. Best months May, June, September and early October.
+- [Kyoto, Japan](https://wanderly.vivekkumarsingh.in/destinations/kyoto): 8 days, from $2,780,
+  group of 6–10, easy. Best months late March to April, and November.
+- [Swiss Alps, Switzerland](https://wanderly.vivekkumarsingh.in/destinations/swiss-alps):
+  8 days, from $3,150, group of 8–12, challenging. Best months late June to mid September.
+- [Ladakh, India](https://wanderly.vivekkumarsingh.in/destinations/ladakh): 10 days, from
+  $1,970, group of 6–10, challenging. Best months June to September.
+- [Iceland](https://wanderly.vivekkumarsingh.in/destinations/iceland): 7 days, from $3,480,
+  group of 8–12, moderate. Best months June to August for the light, late September for the
+  aurora.
+
+## Frequently asked
+
+- **Are flights included in the price?** No. Every price is the land price — accommodation,
+  guides, transport, entries and the listed meals. International flights are excluded
+  because travellers join from four continents and one quoted fare would be wrong for almost
+  everyone.
+- **Can I customize an itinerary?** Yes, within reason. Small changes are free; larger
+  reshapes become a private trip, priced about 20% above the shared rate.
+- **What is the cancellation policy?** Free cancellation for 14 days after booking. After
+  that: more than 60 days out, the 20% deposit only; 60–30 days, 50%; inside 30 days, the
+  full amount.
+- **When is the best time to visit Bali?** May to September. Rainfall falls from about
+  345 mm in January to roughly 30 mm in August while the daily high barely moves off
+  30–32 °C, so Bali is a question of water rather than heat. The charts on the Bali trip page
+  plot both.
+
+## Technical
+
+- Framework: Next.js 16.3 (App Router, Turbopack), React 19, TypeScript 5.
+- Node: 20.9 or newer; 22 LTS recommended.
+- UI: `@the_viveksingh/vivek-ui` v0.5 only. Custom CSS is one file, `app/globals.css`, which
+  re-points seven emerald colour tokens and draws the boarding-pass ticket motif.
+- Charts: `LineChart` and `BarChart` from `@the_viveksingh/vivek-ui/charts`, rendered as
+  inline SVG on the server. No charting dependency is installed.
+- Structured data: TravelAgency and WebSite on the homepage, TouristTrip with itinerary and
+  offers on each trip page, plus BreadcrumbList and FAQPage.
+- Licence: MIT. The VivekUI credit in the footer is removable.
+- Template repository: https://github.com/intellectwithvivek/wanderly (public)
+- Deployed on Vercel at https://wanderly.vivekkumarsingh.in
+
+## For developers evaluating this template
+
+Clone it, replace `data/trips.ts` with your own catalogue, change `SITE.url` in
+`data/site.ts`, and re-point the seven emerald tokens at the top of `app/globals.css`.
+Nothing else needs editing: the sitemap, the canonicals, the Open Graph tags, the
+structured data, the footer link columns and the destination pages are all generated from
+those two data files. `npm run build` prerenders every route.
+
+Full walkthrough: https://github.com/intellectwithvivek/wanderly/blob/main/DOCUMENTATION.md
