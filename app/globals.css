@@ -100,9 +100,13 @@ body {
     transform var(--vk-duration) var(--vk-ease),
     border-color var(--vk-duration) var(--vk-ease);
 
+  -webkit-mask-image:
+    radial-gradient(circle var(--ticket-notch) at 0 var(--ticket-tear), #0000 98%, #000 100%),
+    radial-gradient(circle var(--ticket-notch) at 100% var(--ticket-tear), #0000 98%, #000 100%);
   mask-image:
     radial-gradient(circle var(--ticket-notch) at 0 var(--ticket-tear), #0000 98%, #000 100%),
     radial-gradient(circle var(--ticket-notch) at 100% var(--ticket-tear), #0000 98%, #000 100%);
+  -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
 
@@ -196,6 +200,7 @@ a.ticket:focus-visible::after {
   font-weight: var(--vk-weight-semibold);
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 
@@ -338,6 +343,7 @@ a.ticket:focus-visible::after {
   font-size: 0.6875rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 
