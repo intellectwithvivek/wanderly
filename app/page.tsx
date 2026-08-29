@@ -349,7 +349,7 @@ export default function HomePage() {
         title="The questions we actually get asked"
         description="If yours is not here, email hello@wanderly.example and a human will answer."
         name="home-faq"
-        defaultOpen={0}
+        defaultOpenIndex={0}
         items={siteFaq.map((item) => ({
           id: item.id,
           question: item.question,
@@ -365,7 +365,7 @@ export default function HomePage() {
       {/* ---------------------------------------------- Promotion kit, body */}
       <CTA
         size="xl"
-        variant="primary"
+        background="primary"
         eyebrow="Free and open source"
         title="This whole site is a template you can have"
         description="Every card, chart, timeline and modal on this site is a VivekUI component. Clone it, change the trips, ship it — MIT licensed, credit removable."

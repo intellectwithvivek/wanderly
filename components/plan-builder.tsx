@@ -111,7 +111,7 @@ export function PlanBuilder({ today }: { today: string }) {
             >
               <TagInput
                 value={interests}
-                onChange={setInterests}
+                onValueChange={setInterests}
                 max={5}
                 placeholder="Add an interest and press Enter"
                 validate={(tag) =>
