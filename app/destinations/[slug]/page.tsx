@@ -286,7 +286,7 @@ export default async function DestinationPage({
         eyebrow={`${trip.name} questions`}
         title={`Before you book ${trip.name}`}
         name={`faq-${trip.slug}`}
-        defaultOpen={0}
+        defaultOpenIndex={0}
         items={faq.map((item) => ({
           id: item.id,
           question: item.question,
